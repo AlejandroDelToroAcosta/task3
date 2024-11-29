@@ -5,15 +5,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ParallelMatrixMultiplication {
-    public static double[][] parallelMultiply(double[][] A, double[][] B, int threads) throws Exception {
+    public static double[][] multiply(double[][] A, double[][] B, int threadCount) throws Exception {
         int rowsA = A.length;
         int colsA = A[0].length;
         int colsB = B[0].length;
 
-        double[][] result = new double[rowsA][colsB];
-        ExecutorService executor = Executors.newFixedThreadPool(threads);
-        Future<?>[] futures = new Future<?>[rowsA];
+        if (colsA != B.length) {
+            throw new IllegalArgumentException("Column count of A must match row count of B");
+        }
 
+        double[][] result = new double[rowsA][colsB];
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+
+        // Dividir el trabajo entre los hilos
+        Future<?>[] futures = new Future<?>[rowsA];
         for (int i = 0; i < rowsA; i++) {
             final int row = i;
             futures[i] = executor.submit(() -> {
@@ -25,10 +30,12 @@ public class ParallelMatrixMultiplication {
             });
         }
 
+        // Esperar a que todas las tareas terminen
         for (Future<?> future : futures) {
-            future.get(); // Espera a que termine cada tarea
+            future.get();
         }
-        executor.shutdown();
+
+        executor.shutdown(); // Apagar el ExecutorService
         return result;
     }
 }
