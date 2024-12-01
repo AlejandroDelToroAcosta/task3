@@ -21,7 +21,6 @@ public class MatrixMultiplicationBenchmark {
         matrixA = MatrixGenerator.generateMatrix(size, size);
         matrixB = MatrixGenerator.generateMatrix(size, size);
     }
-
     @Benchmark
     public double[][] multiply() {
         return MatrixMultiplication.basicMultiply(matrixA, matrixB);
